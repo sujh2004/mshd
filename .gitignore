@@ -1,0 +1,73 @@
+# 后端 - Java/Maven
+mshd-backend/target/
+mshd-backend/*.jar
+mshd-backend/*.war
+mshd-backend/*.class
+mshd-backend/.mvn/
+mshd-backend/mvnw
+mshd-backend/mvnw.cmd
+
+# 前端 - Node.js
+mshd-frontend/node_modules/
+mshd-frontend/dist/
+mshd-frontend/.vite/
+mshd-frontend/.cache/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# 日志
+*.log
+logs/
+mshd-backend/logs/
+
+# 数据库
+*.db
+*.sqlite
+
+# 配置文件（可选，包含敏感信息时）
+# mshd-backend/src/main/resources/application-prod.yml
+
+# 上传文件
+uploads/
+temp/
+
+# 操作系统
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# 编译产物
+*.class
+*.jar
+*.war
+*.ear
+
+# 包文件
+*.nar
+*.zip
+*.tar.gz
+*.rar
+
+# 虚拟机崩溃日志
+hs_err_pid*
+
+# Node相关
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# 环境变量
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

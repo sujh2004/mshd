@@ -1,0 +1,78 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: mshd-backend
+
+  # 自动配置排除
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+
+  # MySQL数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mshd?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: Sujinghui2004@
+
+  # JPA配置
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  # MongoDB配置
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: mshd_media
+      # username: admin
+      # password: admin
+
+    # Redis配置 (已禁用)
+    # redis:
+    #   host: localhost
+    #   port: 6379
+    #   database: 0
+    #   password:
+    #   lettuce:
+    #     pool:
+    #       max-active: 8
+    #       max-wait: -1ms
+    #       max-idle: 8
+    #       min-idle: 0
+    #   timeout: 3000ms
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.mshd: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# 文件上传配置
+file:
+  upload-dir: D:/Bupt/2025Autumn/SET/Project/uploads
+  max-size: 100MB
+
+# JWT配置
+jwt:
+  secret: mshd-secret-key-for-disaster-management-system-2025
+  expiration: 86400000 # 24小时
+
+# 数据编码配置
+mshd:
+  encoding:
+    enabled: true
+    version: 2.0
