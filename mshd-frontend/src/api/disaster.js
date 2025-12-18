@@ -13,6 +13,15 @@ export function createDisasterData(data) {
   })
 }
 
+// 更新灾情数据
+export function updateDisasterData(id, data) {
+  return request({
+    url: `/disaster/update/${id}`,
+    method: 'put',
+    data
+  })
+}
+
 // 查询灾情数据列表
 export function getDisasterDataList() {
   return request({

@@ -110,18 +110,40 @@ const categoryChartRef = ref(null)
 const trendChartRef = ref(null)
 
 // 初始化图表
-const initCharts = () => {
-  initSourceChart()
-  initCategoryChart()
-  initTrendChart()
+const initCharts = async (dataList) => {
+  await initSourceChart()
+  await initCategoryChart()
+  initTrendChart(dataList)
 }
 
 // 数据来源分布图
-const initSourceChart = () => {
+const initSourceChart = async () => {
   const chart = echarts.init(sourceChartRef.value)
+
+  // 从后端获取真实数据
+  let chartData = []
+  try {
+    const res = await getStatsBySource()
+    if (res.data) {
+      chartData = Object.keys(res.data).map(key => ({
+        value: res.data[key],
+        name: key
+      }))
+      // 更新数据源数量
+      stats.value.sources = chartData.length
+    }
+  } catch (error) {
+    console.error('获取来源统计失败:', error)
+    // 使用默认数据
+    chartData = [
+      { value: 0, name: '暂无数据' }
+    ]
+  }
+
   const option = {
     tooltip: {
-      trigger: 'item'
+      trigger: 'item',
+      formatter: '{b}: {c} ({d}%)'
     },
     legend: {
       orient: 'vertical',
@@ -153,12 +175,7 @@ const initSourceChart = () => {
         labelLine: {
           show: false
         },
-        data: [
-          { value: 335, name: '业务报送' },
-          { value: 310, name: '泛在感知' },
-          { value: 234, name: '舆情感知' },
-          { value: 135, name: '其他' }
-        ]
+        data: chartData
       }
     ]
   }
@@ -166,14 +183,34 @@ const initSourceChart = () => {
 }
 
 // 灾害类型分布图
-const initCategoryChart = () => {
+const initCategoryChart = async () => {
   const chart = echarts.init(categoryChartRef.value)
+
+  // 从后端获取真实数据
+  let categories = []
+  let values = []
+  try {
+    const res = await getStatsByCategory()
+    if (res.data && Object.keys(res.data).length > 0) {
+      categories = Object.keys(res.data)
+      values = Object.values(res.data)
+    } else {
+      categories = ['暂无数据']
+      values = [0]
+    }
+  } catch (error) {
+    console.error('获取类别统计失败:', error)
+    categories = ['暂无数据']
+    values = [0]
+  }
+
   const option = {
     tooltip: {
       trigger: 'axis',
       axisPointer: {
         type: 'shadow'
-      }
+      },
+      formatter: '{b}: {c} 条'
     },
     grid: {
       left: '3%',
@@ -183,7 +220,11 @@ const initCategoryChart = () => {
     },
     xAxis: {
       type: 'category',
-      data: ['震情', '人员伤亡', '房屋破坏', '生命线工程', '次生灾害']
+      data: categories,
+      axisLabel: {
+        interval: 0,
+        rotate: categories.length > 5 ? 30 : 0
+      }
     },
     yAxis: {
       type: 'value'
@@ -193,7 +234,7 @@ const initCategoryChart = () => {
         name: '数量',
         type: 'bar',
         barWidth: '40%',
-        data: [120, 200, 150, 80, 70],
+        data: values,
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
             { offset: 0, color: '#83bff6' },
@@ -208,11 +249,33 @@ const initCategoryChart = () => {
 }
 
 // 数据趋势图
-const initTrendChart = () => {
+const initTrendChart = (dataList = []) => {
   const chart = echarts.init(trendChartRef.value)
+
+  // 生成最近7天的日期和数据
+  const dates = []
+  const counts = []
+  const today = new Date()
+
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(today)
+    date.setDate(date.getDate() - i)
+    const dateStr = `${date.getMonth() + 1}/${date.getDate()}`
+    dates.push(dateStr)
+
+    // 统计该日期的数据数量
+    const count = dataList.filter(item => {
+      if (!item.createTime) return false
+      const itemDate = new Date(item.createTime)
+      return itemDate.toDateString() === date.toDateString()
+    }).length
+    counts.push(count)
+  }
+
   const option = {
     tooltip: {
-      trigger: 'axis'
+      trigger: 'axis',
+      formatter: '{b}<br/>{a}: {c} 条'
     },
     grid: {
       left: '3%',
@@ -223,7 +286,7 @@ const initTrendChart = () => {
     xAxis: {
       type: 'category',
       boundaryGap: false,
-      data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+      data: dates
     },
     yAxis: {
       type: 'value'
@@ -239,7 +302,13 @@ const initTrendChart = () => {
             { offset: 1, color: 'rgba(24, 144, 255, 0)' }
           ])
         },
-        data: [120, 132, 101, 134, 90, 230, 210]
+        lineStyle: {
+          color: '#1890ff'
+        },
+        itemStyle: {
+          color: '#1890ff'
+        },
+        data: counts
       }
     ]
   }
@@ -259,9 +328,21 @@ const loadData = async () => {
       stats.value.today = res.data.filter(item => {
         return new Date(item.createTime).toDateString() === today
       }).length
+
+      // 处理中的数据（示例：最近24小时的数据）
+      const oneDayAgo = new Date()
+      oneDayAgo.setHours(oneDayAgo.getHours() - 24)
+      stats.value.processing = res.data.filter(item => {
+        const createTime = new Date(item.createTime)
+        return createTime >= oneDayAgo
+      }).length
+
+      return res.data
     }
+    return []
   } catch (error) {
     console.error('加载数据失败:', error)
+    return []
   }
 }
 
@@ -277,9 +358,9 @@ const getCarrierTypeTag = (type) => {
 }
 
 onMounted(async () => {
-  await loadData()
+  const dataList = await loadData()
   await nextTick()
-  initCharts()
+  await initCharts(dataList)
 
   // 响应式调整图表大小
   window.addEventListener('resize', () => {

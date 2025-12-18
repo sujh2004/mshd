@@ -41,6 +41,21 @@ public class DisasterDataController {
     }
 
     /**
+     * 更新灾情数据
+     */
+    @PutMapping("/update/{id}")
+    public Result<DisasterData> update(@PathVariable Long id, @RequestBody DisasterData disasterData) {
+        try {
+            disasterData.setId(id);
+            DisasterData updated = disasterDataService.save(disasterData);
+            return Result.success("更新成功", updated);
+        } catch (Exception e) {
+            log.error("更新灾情数据失败", e);
+            return Result.error("更新失败: " + e.getMessage());
+        }
+    }
+
+    /**
      * 根据ID查询
      */
     @GetMapping("/{id}")

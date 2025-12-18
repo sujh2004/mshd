@@ -67,15 +67,30 @@
 
         <div class="header-right">
           <el-icon class="header-icon"><Bell /></el-icon>
-          <el-dropdown>
+          <el-dropdown @command="handleCommand">
             <span class="user-info">
               <el-avatar size="small" icon="UserFilled" />
-              <span class="username">管理员</span>
+              <span class="username">{{ userStore.realName || userStore.username || '用户' }}</span>
+              <el-icon style="margin-left: 5px;"><ArrowDown /></el-icon>
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item>个人中心</el-dropdown-item>
-                <el-dropdown-item divided>退出登录</el-dropdown-item>
+                <el-dropdown-item disabled>
+                  <div style="padding: 5px 0;">
+                    <div style="font-weight: 600;">{{ userStore.username }}</div>
+                    <div style="font-size: 12px; color: #909399; margin-top: 3px;">
+                      {{ userStore.department || '未设置部门' }}
+                    </div>
+                  </div>
+                </el-dropdown-item>
+                <el-dropdown-item divided command="profile">
+                  <el-icon><User /></el-icon>
+                  个人中心
+                </el-dropdown-item>
+                <el-dropdown-item command="logout">
+                  <el-icon><SwitchButton /></el-icon>
+                  退出登录
+                </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -92,9 +107,14 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
+const router = useRouter()
+const userStore = useUserStore()
+
 const isCollapse = ref(false)
 
 const currentRoute = computed(() => route.path)
@@ -102,6 +122,30 @@ const currentMeta = computed(() => route.meta)
 
 const toggleCollapse = () => {
   isCollapse.value = !isCollapse.value
+}
+
+// 处理下拉菜单命令
+const handleCommand = (command) => {
+  if (command === 'logout') {
+    handleLogout()
+  } else if (command === 'profile') {
+    ElMessage.info('个人中心功能开发中...')
+  }
+}
+
+// 退出登录
+const handleLogout = () => {
+  ElMessageBox.confirm('确定要退出登录吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    await userStore.logout()
+    ElMessage.success('已退出登录')
+    router.push('/login')
+  }).catch(() => {
+    // 取消退出
+  })
 }
 </script>
 
