@@ -175,7 +175,7 @@ source database/insert_more_data.sql
 cd mshd-backend
 
 # 修改配置文件 src/main/resources/application.yml
-# 配置数据库连接信息（默认密码：Sujinghui2004@）
+# 配置数据库连接信息
 
 # 使用Maven启动
 mvn spring-boot:run
