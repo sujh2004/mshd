@@ -106,7 +106,7 @@ INSERT INTO disaster_data (
     disaster_code, disaster_category, disaster_subcategory, indicator_code,
     content, ttl, status
 ) VALUES (
-    '63262620020620210522020400101030200',
+    '632626200206202105220204001010302001',
     '63262620020620210522020400',
     '632626200206',
     '青海省海东市民和回族土族自治县',

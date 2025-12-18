@@ -21,21 +21,16 @@
 
         <el-form-item label="数据来源">
           <el-select v-model="filterForm.sourceType" placeholder="全部" clearable style="width: 150px">
-            <el-option label="后方指挥部" value="后方指挥部" />
-            <el-option label="现场指挥部" value="现场指挥部" />
-            <el-option label="业务报送" value="业务报送" />
-            <el-option label="泛在感知" value="泛在感知" />
-            <el-option label="舆情感知" value="舆情感知" />
+            <el-option label="业务报送(business)" value="business" />
+            <el-option label="泛在感知(ubiquitous)" value="ubiquitous" />
           </el-select>
         </el-form-item>
 
         <el-form-item label="灾害类别">
           <el-select v-model="filterForm.disasterCategory" placeholder="全部" clearable style="width: 150px">
-            <el-option label="震情" value="震情" />
-            <el-option label="人员伤亡" value="人员伤亡" />
-            <el-option label="房屋破坏" value="房屋破坏" />
-            <el-option label="生命线工程" value="生命线工程" />
-            <el-option label="次生灾害" value="次生灾害" />
+            <el-option label="人员伤亡" value="2" />
+            <el-option label="房屋破坏" value="3" />
+            <el-option label="次生灾害" value="5" />
           </el-select>
         </el-form-item>
 

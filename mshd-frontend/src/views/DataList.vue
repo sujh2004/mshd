@@ -13,9 +13,13 @@
 
         <el-form-item label="数据来源">
           <el-select v-model="searchForm.sourceCode" placeholder="请选择" clearable>
-            <el-option label="业务报送" value="1" />
-            <el-option label="泛在感知" value="2" />
-            <el-option label="其他" value="3" />
+            <el-option label="后方指挥部" value="101" />
+            <el-option label="现场指挥部" value="102" />
+            <el-option label="前方指挥部" value="100" />
+            <el-option label="业务报送" value="201" />
+            <el-option label="泛在感知" value="202" />
+            <el-option label="舆情感知" value="203" />
+            <el-option label="通信网感知" value="200" />
           </el-select>
         </el-form-item>
 
@@ -388,8 +392,31 @@ const loadData = async () => {
   try {
     const res = await getDisasterDataList()
     if (res.data) {
-      tableData.value = res.data
-      total.value = res.data.length
+      let filteredData = res.data
+
+      // 按编码ID筛选
+      if (searchForm.value.encodedId) {
+        filteredData = filteredData.filter(item =>
+          item.encodedId && item.encodedId.includes(searchForm.value.encodedId)
+        )
+      }
+
+      // 按来源码筛选
+      if (searchForm.value.sourceCode) {
+        filteredData = filteredData.filter(item =>
+          item.sourceCode && item.sourceCode.startsWith(searchForm.value.sourceCode)
+        )
+      }
+
+      // 按载体类型筛选
+      if (searchForm.value.carrierType) {
+        filteredData = filteredData.filter(item =>
+          item.carrierType === searchForm.value.carrierType
+        )
+      }
+
+      tableData.value = filteredData
+      total.value = filteredData.length
     }
   } catch (error) {
     ElMessage.error('加载数据失败')
